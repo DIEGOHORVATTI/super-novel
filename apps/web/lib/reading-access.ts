@@ -1,5 +1,20 @@
 export const FREE_CHAPTER_LIMIT = 30;
 
+export const ANON_CHAPTER_LIMIT = 5;
+export const ANON_READS_COOKIE = "sn_anon_reads";
+export const COOKIE_PROBE_PARAM = "ck";
+
+/**
+ * Chapters a visitor without an account has opened, kept in a cookie as a comma list.
+ * Returns the updated list, or null when this chapter is past the limit.
+ * ponytail: clearing cookies resets the count; a server counter needs a DB hit per read.
+ */
+export function anonReadsAfter(stored: string, chapterSlug: string) {
+  const reads = stored.split(",").filter(Boolean);
+  if (reads.includes(chapterSlug)) return reads;
+  return reads.length < ANON_CHAPTER_LIMIT ? [...reads, chapterSlug] : null;
+}
+
 type ChapterAccess = {
   premium: boolean;
   alreadyRead: boolean;

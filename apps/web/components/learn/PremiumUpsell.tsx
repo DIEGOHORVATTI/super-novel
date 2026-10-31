@@ -4,12 +4,10 @@ import { useState } from "react";
 
 import { Icon } from "@/components/Icon";
 import { useSession } from "@/lib/auth/client";
-import { FREE_CHAPTER_LIMIT } from "@/lib/reading-access";
 import { routes } from "@/lib/routes";
 import { rpc } from "@/lib/rpc/client";
 
 const PERKS = [
-  "Capítulos ilimitados",
   "Palavras novas e cards ilimitados",
   "Sentence mining (minerar frases)",
   "Estatísticas avançadas de aprendizado",
@@ -44,9 +42,8 @@ export function PremiumUpsell() {
   return (
     <div className="donate-wrap">
       <h1 className="donate-title">Super Novel Premium</h1>
-      <p className="donate-sub">
-        A conta grátis lê {FREE_CHAPTER_LIMIT} capítulos. Assine para continuar lendo.
-      </p>
+      {/* Paywall switched off: <p>A conta grátis lê {FREE_CHAPTER_LIMIT} capítulos…</p> */}
+      <p className="donate-sub">Aprenda sem limites enquanto lê suas novels favoritas.</p>
 
       <div className="settings-card">
         <ul className="premium-perks">
