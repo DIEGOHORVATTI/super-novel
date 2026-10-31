@@ -84,6 +84,10 @@ descartados por `isNovelSlug` em `lib/library.ts`; `/manga/*` redireciona para a
   toque; prompt nativo do Chrome ou passo a passo no Safari/Firefox). Layout fixo embaixo respeita
   `env(safe-area-inset-bottom)`. Play Store foi descartada (catálogo sem licença arriscaria a conta
   de desenvolvedor); a pipeline TWA está no histórico do git (commit 8d9b675) se um dia voltar.
+- **Limite de leitura:** `/read` exige login (`proxy.ts` barra sem cookie, a página valida a
+  sessão) e `claimChapter` (`lib/reading-claim.ts`) limita a conta grátis a `FREE_CHAPTER_LIMIT`
+  capítulos, contados em `reading_events`; depois vai para `/learn/premium`. Rota nova que
+  devolva texto de capítulo precisa passar por `claimChapter` e nunca usar cache público.
 - **Páginas legais** (`privacy`, `cookies`, `terms`): listam os dados coletados e os fornecedores
   (Vercel, Neon, Resend, Mercado Pago, Google, Microsoft Edge). Dado novo ou serviço externo novo
   → atualize-as (LGPD). Contato e DMCA são só por formulário (`legal_requests` + `ADMIN_EMAIL`);

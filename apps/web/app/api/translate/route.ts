@@ -1,9 +1,12 @@
+import { getCurrentUser } from "@/lib/auth/session";
 import { getChapter } from "@/lib/catalog";
+import { claimChapter } from "@/lib/reading-claim";
 import { translate, translateParagraphs } from "@/lib/translate";
 
 export const runtime = "nodejs";
 
 const CACHE = { "Cache-Control": "public, max-age=31536000, immutable" };
+const PRIVATE_CACHE = { "Cache-Control": "private, max-age=31536000, immutable" };
 
 /** Portuguese meaning of one English word (`?w=`), for the reader's word popup. */
 async function wordMeaning(word: string) {
@@ -18,7 +21,8 @@ async function wordMeaning(word: string) {
 
 /**
  * English version of a chapter, paragraph-aligned with the Portuguese one. The
- * chapter text doesn't change, so the CDN keeps it for a year: one translation per chapter.
+ * chapter text doesn't change, so each browser keeps it for a year. Never the shared CDN:
+ * chapter text is behind the reading limit.
  */
 export async function GET(req: Request) {
   const params = new URL(req.url).searchParams;
@@ -30,14 +34,20 @@ export async function GET(req: Request) {
     return Response.json({ error: "Parâmetros inválidos" }, { status: 400 });
   }
 
+  const user = await getCurrentUser();
+  if (!user) return Response.json({ error: "Faça login para ler" }, { status: 401 });
+
   const chapter = await getChapter(slug).catch(() => null);
   if (!chapter?.paragraphs.length) {
     return Response.json({ error: "Capítulo não encontrado" }, { status: 404 });
   }
 
+  const allowed = await claimChapter(user.id, chapter.novelSlug ?? slug, slug);
+  if (!allowed) return Response.json({ error: "Limite de leitura atingido" }, { status: 403 });
+
   try {
     const paragraphs = await translateParagraphs(chapter.paragraphs);
-    return Response.json({ paragraphs }, { headers: CACHE });
+    return Response.json({ paragraphs }, { headers: PRIVATE_CACHE });
   } catch (error) {
     return Response.json(
       { error: error instanceof Error ? error.message : "Falha na tradução" },

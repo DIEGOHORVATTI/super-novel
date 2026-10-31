@@ -485,7 +485,7 @@ export const learnRouter = {
     const sub = await createSubscription({
       email: user.email,
       amount: PREMIUM_PRICE_BRL,
-      reason: "Super Novel | Premium (aprendizado de idiomas)",
+      reason: "Super Novel | Premium",
       backUrl: `${origin}/learn?upgraded=1`,
     });
 

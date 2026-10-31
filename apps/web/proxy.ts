@@ -1,6 +1,8 @@
+import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { normalizeCode, REF_COOKIE, REF_COOKIE_MAX_AGE_S } from "@/lib/affiliate";
+import { routes } from "@/lib/routes";
 
 /**
  * Edge proxy (Next 16 "proxy" convention | the renamed middleware). First-touch
@@ -9,6 +11,13 @@ import { normalizeCode, REF_COOKIE, REF_COOKIE_MAX_AGE_S } from "@/lib/affiliate
  * First touch wins; we never overwrite an existing cookie.
  */
 export function proxy(request: NextRequest): NextResponse {
+  // Anonymous readers and crawlers stop here, before any catalog scraping. The real
+  // session + limit check is in the page; this cookie test only sheds the traffic.
+  const { pathname } = request.nextUrl;
+  if (pathname.startsWith("/read/") && !getSessionCookie(request)) {
+    return NextResponse.redirect(new URL(routes.loginThen(pathname), request.url));
+  }
+
   const response = NextResponse.next();
 
   // First-touch affiliate code | never overwrite an existing cookie.

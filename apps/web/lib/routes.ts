@@ -37,6 +37,7 @@ export const routes = {
   settings: "/settings",
   // auth
   login: "/login",
+  loginThen: (next: string) => `/login${qs({ next })}`,
   signup: "/signup",
   forgotPassword: "/forgot-password",
   resetPassword: "/reset-password",

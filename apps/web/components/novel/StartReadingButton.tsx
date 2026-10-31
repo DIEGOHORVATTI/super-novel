@@ -21,6 +21,7 @@ export function StartReadingButton({ novelSlug, firstChapterSlug }: StartReading
     <Button
       component={Link}
       href={routes.read(target)}
+      prefetch={false}
       variant="contained"
       color="primary"
       size="large"

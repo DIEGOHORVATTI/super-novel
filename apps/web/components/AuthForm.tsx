@@ -13,6 +13,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { varAlpha } from "minimal-shared/utils";
 import NextLink from "next/link";
+import { safeNextPath } from "@/lib/reading-access";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
@@ -88,6 +89,7 @@ function SwitchLine({ text, action, href }: { text: string; action: string; href
 export function AuthForm({ mode }: { mode: Mode }) {
   const router = useRouter();
   const params = useSearchParams();
+  const nextPath = safeNextPath(params.get("next"));
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -121,7 +123,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
           }
           throw new Error(res.error.message);
         }
-        router.push(routes.home);
+        router.push(nextPath);
         router.refresh();
         return;
       }
@@ -152,7 +154,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
     setBusy(true);
     setError(null);
     try {
-      await authClient.signIn.social({ provider: "google", callbackURL: routes.home });
+      await authClient.signIn.social({ provider: "google", callbackURL: nextPath });
     } catch {
       setError("Não foi possível entrar com o Google.");
       setBusy(false);
