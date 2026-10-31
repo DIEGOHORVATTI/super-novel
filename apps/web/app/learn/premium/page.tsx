@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { PremiumUpsell } from "@/components/learn/PremiumUpsell";
+import { routes } from "@/lib/routes";
 
-export const metadata: Metadata = { title: "Premium" };
-
+// Paywall switched off. To charge again, restore:
+// export const metadata: Metadata = { title: "Premium" };
+// export default function PremiumPage() { return <PremiumUpsell />; }
 export default function PremiumPage() {
-  return <PremiumUpsell />;
+  redirect(routes.home);
 }

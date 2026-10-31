@@ -96,7 +96,9 @@ export function AuthForm({ mode }: { mode: Mode }) {
   const [showPw, setShowPw] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(
+    params.has("limit") ? "Você leu os capítulos grátis. Entre para continuar lendo." : null,
+  );
 
   const copy = COPY[mode];
 

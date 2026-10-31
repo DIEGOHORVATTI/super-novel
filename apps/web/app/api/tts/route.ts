@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/auth/session";
+import { hasReaderCookie } from "@/lib/reader-gate";
 import { VOICE_ID } from "@/lib/tts/edge-protocol";
 import { synthesize } from "@/lib/tts/edge";
 
@@ -17,7 +17,7 @@ function percent(value: string | null) {
  * text), so the CDN caches it for a year and the same sentence is synthesized once.
  */
 export async function GET(req: Request) {
-  if (!(await getCurrentUser())) {
+  if (!hasReaderCookie(req)) {
     return Response.json({ error: "Faça login para ouvir" }, { status: 401 });
   }
 

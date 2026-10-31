@@ -1,6 +1,12 @@
 import { describe, expect, test } from "bun:test";
 
-import { FREE_CHAPTER_LIMIT, canOpenChapter, safeNextPath } from "../lib/reading-access";
+import {
+  ANON_CHAPTER_LIMIT,
+  FREE_CHAPTER_LIMIT,
+  anonReadsAfter,
+  canOpenChapter,
+  safeNextPath,
+} from "../lib/reading-access";
 
 const free = { premium: false, alreadyRead: false };
 
@@ -14,6 +20,20 @@ describe("canOpenChapter", () => {
     const chaptersRead = FREE_CHAPTER_LIMIT;
     expect(canOpenChapter({ ...free, alreadyRead: true, chaptersRead })).toBe(true);
     expect(canOpenChapter({ ...free, premium: true, chaptersRead })).toBe(true);
+  });
+});
+
+describe("anonReadsAfter", () => {
+  const full = Array.from({ length: ANON_CHAPTER_LIMIT }, (_, index) => `c${index}`).join(",");
+
+  test("counts distinct chapters from the empty probe cookie", () => {
+    expect(anonReadsAfter(",", "c0")).toEqual(["c0"]);
+    expect(anonReadsAfter("c0", "c0")).toEqual(["c0"]);
+  });
+
+  test("blocks a new chapter at the limit but reopens old ones", () => {
+    expect(anonReadsAfter(full, "new")).toBeNull();
+    expect(anonReadsAfter(full, "c0")).toHaveLength(ANON_CHAPTER_LIMIT);
   });
 });
 
