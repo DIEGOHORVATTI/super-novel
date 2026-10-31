@@ -45,6 +45,7 @@ function ChapterRow({ chapter, isRead, isCurrent }: ChapterRowProps) {
     <ButtonBase
       component={Link}
       href={routes.read(chapter.slug)}
+      prefetch={false}
       sx={(theme) => ({
         gap: 1.5,
         p: 1.25,

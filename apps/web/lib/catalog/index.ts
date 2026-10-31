@@ -58,20 +58,19 @@ type AjaxSearch = {
   }[];
 };
 
-export async function browseNovels({
-  sort = "popular",
-  genre,
-  status,
-  page = 1,
-}: BrowseOptions = {}): Promise<NovelPage> {
-  const url = new URL(`${SITE_URL}/series/`);
-  url.searchParams.set("order", sort);
-  if (genre) url.searchParams.append("genre[]", genre);
-  if (status) url.searchParams.set("status", STATUS_FILTER[status]);
-  if (page > 1) url.searchParams.set("page", String(page));
+export const browseNovels = unstable_cache(
+  async ({ sort = "popular", genre, status, page = 1 }: BrowseOptions = {}): Promise<NovelPage> => {
+    const url = new URL(`${SITE_URL}/series/`);
+    url.searchParams.set("order", sort);
+    if (genre) url.searchParams.append("genre[]", genre);
+    if (status) url.searchParams.set("status", STATUS_FILTER[status]);
+    if (page > 1) url.searchParams.set("page", String(page));
 
-  return parseNovelList(await fetchText(url.toString(), { revalidate: HOUR }));
-}
+    return parseNovelList(await fetchText(url.toString(), { revalidate: HOUR }));
+  },
+  ["central-novel", "browse"],
+  { revalidate: HOUR },
+);
 
 export async function searchNovels(query: string, page = 1): Promise<NovelPage> {
   const url = new URL(page > 1 ? `${SITE_URL}/page/${page}/` : `${SITE_URL}/`);
@@ -93,9 +92,12 @@ export async function suggestNovels(query: string): Promise<NovelSummary[]> {
   }));
 }
 
-export async function getGenres(): Promise<Genre[]> {
-  return parseGenres(await fetchText(`${SITE_URL}/series/`, { revalidate: 24 * HOUR }));
-}
+export const getGenres = unstable_cache(
+  async (): Promise<Genre[]> =>
+    parseGenres(await fetchText(`${SITE_URL}/series/`, { revalidate: 24 * HOUR })),
+  ["central-novel", "genres"],
+  { revalidate: 24 * HOUR },
+);
 
 export const getNovel = unstable_cache(
   async (slug: string): Promise<Novel | null> => {

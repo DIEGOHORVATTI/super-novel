@@ -47,6 +47,7 @@ export function ContinueReadingRail() {
             <CardActionArea
               component={Link}
               href={routes.read(entry.chapterId)}
+              prefetch={false}
               sx={{ borderRadius: 1.5, p: 0.5 }}
             >
               <NovelCover src={entry.imageUrl} title={entry.name} />

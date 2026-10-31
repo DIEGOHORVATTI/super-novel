@@ -24,6 +24,7 @@ export function NovelCard({ novel }: NovelCardProps) {
       <CardActionArea
         component={Link}
         href={routes.novel(novel.slug)}
+        prefetch={false}
         sx={{ borderRadius: 1.5, p: 0.5 }}
       >
         <NovelCover src={novel.cover} title={novel.title} />
