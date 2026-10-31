@@ -18,6 +18,14 @@ type NovelPageProps = {
   params: Promise<{ slug: string }>;
 };
 
+// Cached at the CDN: a crawler walking the catalog must not run a function per page.
+// Errors are thrown, not swallowed, so a Central Novel outage keeps the last good page.
+export const revalidate = 21600;
+
+export function generateStaticParams() {
+  return [];
+}
+
 const STATUS_LABEL = { ongoing: "Em andamento", completed: "Completa", hiatus: "Em hiato" };
 
 const teaser = (text = "", max = 200) =>
@@ -25,7 +33,7 @@ const teaser = (text = "", max = 200) =>
 
 export async function generateMetadata({ params }: NovelPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const novel = await getNovel(slug).catch(() => null);
+  const novel = await getNovel(slug);
   if (!novel) return { title: "Novel não encontrada" };
 
   const title = `${novel.title} | Ler e ouvir em português`;
@@ -45,10 +53,7 @@ export async function generateMetadata({ params }: NovelPageProps): Promise<Meta
 
 export default async function NovelPage({ params }: NovelPageProps) {
   const { slug } = await params;
-  const [novel, chapters] = await Promise.all([
-    getNovel(slug).catch(() => null),
-    getChapters(slug).catch(() => []),
-  ]);
+  const [novel, chapters] = await Promise.all([getNovel(slug), getChapters(slug)]);
   if (!novel) notFound();
 
   const base = env.SITE_URL ?? "http://localhost:3000";
